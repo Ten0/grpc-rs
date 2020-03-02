@@ -3,7 +3,7 @@
 pub mod client;
 pub mod server;
 
-use std::fmt::{self, Debug};
+use std::fmt::{self, Debug, Display};
 use std::sync::Arc;
 use std::{ptr, slice};
 
@@ -35,6 +35,12 @@ impl From<i32> for RpcStatusCode {
 impl Into<i32> for RpcStatusCode {
     fn into(self) -> i32 {
         self.0
+    }
+}
+
+impl Display for RpcStatusCode {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        Debug::fmt(self, f)
     }
 }
 
@@ -153,6 +159,12 @@ pub struct RpcStatus {
 
     /// Optional detail string.
     pub details: Option<String>,
+}
+
+impl Display for RpcStatus {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+        Debug::fmt(self, fmt)
+    }
 }
 
 impl RpcStatus {
