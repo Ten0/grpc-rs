@@ -3,6 +3,7 @@
 pub mod client;
 pub mod server;
 
+use std::fmt::{self, Debug};
 use std::sync::Arc;
 use std::{ptr, slice};
 
@@ -22,7 +23,7 @@ const BUF_SHRINK_SIZE: usize = 4 * 1024;
 
 /// An gRPC status code structure.
 /// This type contains constants for all gRPC status codes.
-#[derive(PartialEq, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub struct RpcStatusCode(i32);
 
 impl From<i32> for RpcStatusCode {
@@ -40,13 +41,27 @@ impl Into<i32> for RpcStatusCode {
 macro_rules! status_codes {
     (
         $(
-            ($num:expr, $konst:ident);
+            ($num:path, $konst:ident);
         )+
     ) => {
         impl RpcStatusCode {
         $(
             pub const $konst: RpcStatusCode = RpcStatusCode($num);
         )+
+        }
+
+        impl Debug for RpcStatusCode {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                write!(
+                    f,
+                    "{}-{}",
+                    self.0,
+                    match self {
+                        $(RpcStatusCode($num) => stringify!($konst),)+
+                        RpcStatusCode(_) => "INVALID_STATUS_CODE",
+                    }
+                )
+            }
         }
     }
 }
